@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공도의 인생 점수 - 수학의 심판</title>
+<style>
+/* 기본 리셋 및 폰트 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #0b0f19; color: #f8fafc; min-height: 100vh; line-height: 1.6; }
+
+/* 네비게이션바 */
+.nav { background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #1e293b; padding: 12px 24px; display: flex; gap: 8px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; justify-content: center;}
+.nb { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; transition: all 0.2s; }
+.nb:hover { border-color: #ef4444; color: #ef4444; }
+.nb.on { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444; font-weight: 700; }
+
+/* 페이지 컨테이너 */
+.app { max-width: 900px; margin: 0 auto; padding-bottom: 60px; }
+.pg { display: none; padding: 32px 20px; animation: fadeIn 0.5s ease; }
+.pg.on { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+/* 타이포그래피 */
+.sec-title { font-size: 32px; font-weight: 800; color: #ef4444; margin-bottom: 8px; letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+.sec-sub { font-size: 16px; color: #94a3b8; margin-bottom: 32px; }
+
+/* 카드 UI */
+.card { background: #161e2e; border: 1px solid #1e293b; border-radius: 16px; padding: 28px; margin-bottom: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
+.card-sm { background: #161e2e; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; text-align: center; }
+
+/* 버튼 */
+.btn-gold { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-weight: 800; font-size: 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(153, 27, 27, 0.4); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(239, 68, 68, 0.5); }
+.btn-gold:disabled { background: #64748b; color: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+.btn-out { background: transparent; border: 1px solid #ef4444; color: #ef4444; border-radius: 8px; padding: 14px 24px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.btn-out:hover { background: rgba(239, 68, 68, 0.1); }
+.btn-red { background: rgba(153, 27, 27, 0.2); border: 1px solid #991b1b; color: #fca5a5; border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-blue { background: rgba(30, 58, 138, 0.2); border: 1px solid #1d4ed8; color: #93c5fd; border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+/* 음성 듣기 버튼 전용 */
+.btn-voice { display: inline-flex; align-items: center; gap: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid #64748b; color: #fbbf24; border-radius: 20px; padding: 8px 16px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.btn-voice:hover { background: #1e293b; border-color: #fbbf24; transform: scale(1.02); }
+
+/* 피드백 메시지 */
+.feedback { border-radius: 8px; padding: 16px; font-size: 16px; margin-top: 16px; display: none; font-weight: 600; }
+.fb-ok { background: rgba(22, 101, 52, 0.2); border: 1px solid #166534; color: #4ade80; display: block !important; }
+.fb-ng { background: rgba(153, 27, 27, 0.2); border: 1px solid #991b1b; color: #f87171; display: block !important; }
+.fb-tip { background: rgba(217, 119, 6, 0.2); border: 1px solid #b45309; color: #fbbf24; display: block !important; }
+
+/* 대화창 UI */
+.speech-row { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+.char-circle { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+.angel-c { background: #1e3a8a; border: 2px solid #3b82f6; }
+.devil-c { background: #450a0a; border: 2px solid #ef4444; }
+.bubble { flex: 1; border-radius: 16px; padding: 18px 24px; font-size: 16px; line-height: 1.7; }
+.angel-b { background: #161e2e; border: 1px solid #3b82f6; color: #e2e8f0; border-top-left-radius: 4px; }
+.devil-b { background: #161e2e; border: 1px solid #ef4444; color: #e2e8f0; border-top-left-radius: 4px; }
+.bubble-name { font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+.angel-n { color: #60a5fa; }
+.devil-n { color: #f87171; }
+
+/* 입력창 */
+.blank-input { background: transparent; border: none; border-bottom: 2px solid #ef4444; color: #ef4444; padding: 4px 8px; font-size: 18px; text-align: center; width: 80px; font-weight: 800; }
+.blank-input:focus { outline: none; background: rgba(239, 68, 68, 0.1); }
+.blank-text { background: #0b0f19; border: 1px solid #334155; color: #f8fafc; padding: 14px; font-size: 15px; border-radius: 8px; width: 100%; resize: none; margin-top: 8px; font-family: inherit; }
+.blank-text:focus { outline: none; border-color: #ef4444; }
+
+/* 저울 및 테이블 */
+.scale-status { font-size: 15px; text-align: center; padding: 8px 24px; border-radius: 24px; display: inline-block; margin: 8px auto; font-weight: 700; }
+.st-balanced { background: rgba(22, 101, 52, 0.3); color: #4ade80; border: 1px solid #166534; }
+.st-tilt { background: rgba(153, 27, 27, 0.3); color: #f87171; border: 1px solid #991b1b; }
+
+.eq-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.eq-table th { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 14px; text-align: left; border-bottom: 2px solid #ef4444; }
+.eq-table td { padding: 16px 14px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+.eq-input { background: #0b0f19; border: 1px solid #334155; color: #ef4444; padding: 12px; font-size: 18px; font-family: 'Cambria Math', Georgia, serif; border-radius: 6px; width: 100%; text-align: center; font-weight: bold; letter-spacing: 2px;}
+.eq-input:focus { outline: none; border-color: #ef4444; }
+
+/* 진행도 바 */
+.progress-bar { background: #1e293b; border-radius: 10px; height: 10px; margin: 8px 0 32px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #b91c1c); transition: width 0.4s ease; }
+
+/* 도입부 그리드 레이아웃 */
+.intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; margin-bottom: 40px; }
+@media (max-width: 768px) { .intro-grid { grid-template-columns: 1fr; } }
+
+/* 무서운 지옥불 이미지 */
+.intro-img-box { border-radius: 16px; overflow: hidden; border: 2px solid #ef4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.4); height: 100%; min-height: 350px; background: #000; position: relative;}
+
+/* 수학 토큰 (배지 스타일) */
+.math-tok { display: inline-flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 800; margin: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.6); letter-spacing: 0.5px; }
+.tok-b { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; } /* 빨간 하트 */
+.tok-s { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #93c5fd; } /* 파란 풍선 */
+.tok-x { background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; } /* 보라색 미지수 */
+
+/* 순수 CSS 황금 저울 디자인 */
+.css-scale-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 350px; background: radial-gradient(circle at center, #2e1010 0%, #0b0f19 80%); border-radius: 16px; border: 2px solid #ef4444; box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 0 20px rgba(239, 68, 68, 0.2); position: relative; overflow: hidden; }
+.css-scale { position: relative; width: 200px; height: 180px; z-index: 10; margin-top: 20px;}
+.css-scale-base { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 16px; background: linear-gradient(to bottom, #7f1d1d, #450a0a); border-radius: 8px 8px 4px 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+.css-scale-pillar { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); width: 16px; height: 120px; background: linear-gradient(to right, #991b1b, #f87171, #991b1b); }
+.css-scale-beam { position: absolute; top: 34px; left: 50%; transform: translateX(-50%); width: 180px; height: 10px; background: linear-gradient(to bottom, #fca5a5, #b91c1c); border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+.css-scale-pan { position: absolute; top: 44px; width: 50px; height: 50px; border-bottom: 6px solid #ef4444; border-left: 2px solid #ef4444; border-right: 2px solid #ef4444; border-radius: 0 0 25px 25px; box-shadow: inset 0 -5px 10px rgba(239, 68, 68, 0.3); }
+.css-scale-rope { position: absolute; top: 44px; width: 2px; height: 30px; background: #94a3b8; }
+.pan-left { left: 5px; }
+.pan-right { right: 5px; }
+.rope-left-1 { left: 5px; transform: rotate(-20deg); transform-origin: top; }
+.rope-left-2 { left: 53px; transform: rotate(20deg); transform-origin: top; }
+.rope-right-1 { right: 53px; transform: rotate(-20deg); transform-origin: top; }
+.rope-right-2 { right: 5px; transform: rotate(20deg); transform-origin: top; }
+.css-glow { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; background: rgba(239, 68, 68, 0.4); filter: blur(30px); border-radius: 50%; animation: pulse 2s infinite alternate; z-index: 1;}
+
+@keyframes pulse { 0% { opacity: 0.3; transform: translateX(-50%) scale(0.9); } 100% { opacity: 0.8; transform: translateX(-50%) scale(1.5); } }
+
+/* 파란 풍선 효과 필터 */
+.blue-balloon { filter: hue-rotate(210deg); display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <button class="nb on" onclick="goPage('intro')">🏰 01. 도입</button>
+  <button class="nb" onclick="goPage('lab')">🔬 02. 저울실험</button>
+  <button class="nb" onclick="goPage('concept')">⚖️ 03. 등식의 성질</button>
+  <button class="nb" onclick="goPage('story')">💬 04. 영혼의 담판</button>
+  <button class="nb" onclick="goPage('mission')">⚔️ 05. 미션 보고</button>
+  <button class="nb" onclick="goPage('quiz')">📝 06. 최종 확인</button>
+  <button class="nb" onclick="goPage('feedback')">💌 07. 피드백 확인</button>
+</div>
+
+<div class="app">
+  <!-- ══ 도입 ══ -->
+  <div id="pg-intro" class="pg on">
+    <div style="font-size: 14px; color: #94a3b8; letter-spacing: 2px; margin-bottom: 8px;">THE MATHEMATICAL JUDGMENT</div>
+    <div class="sec-title" style="font-size: 42px; margin-bottom: 40px;">공도의 인생 점수</div>
+    
+    <div class="intro-grid">
+      <div style="display: flex; flex-direction: column; justify-content: center;">
+        
+        <!-- 염라대왕 음성 재생 버튼 -->
+        <button class="btn-voice" onclick="playYamaVoice()">
+          <span style="font-size: 20px;">🔊</span> 염라대왕의 호통 듣기
+        </button>
+
+        <div style="background: rgba(30, 41, 59, 0.6); padding: 24px; border-radius: 16px; border-left: 4px solid #ef4444; margin-bottom: 24px; font-size: 15px; color: #cbd5e1; line-height: 1.8; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          <p id="story-text-1" style="margin-bottom: 12px;">천사와 악마의 팽팽한 경쟁으로 영혼 '공도'가 하늘에 계속 떠있자, 마침내 염라대왕이 나타나 호통을 쳤습니다.</p>
+          <p id="story-text-2" style="color: #fbbf24; font-weight: 800; font-size: 17px; margin-bottom: 12px;">"천국으로 갈지 지옥으로 갈지는 내가 결정하는 것인데 감히 내 허락도 없이 데려가려 하느냐!"</p>
+          <p id="story-text-3" style="margin-bottom: 12px;">사실 염라대왕은 매번 선악의 정도를 계산하는 일에 지쳐있었습니다. 그래서 이 기회에 그 귀찮은 일을 천사와 악마에게 시키기로 마음먹었습니다.</p>
+          <p id="story-text-4" style="color: #ef4444; font-weight: 800; font-size: 18px; line-height: 1.5; margin-bottom: 12px;">"절대로 한순간도 저 저울이 한쪽으로 기울어서는 안 된다. 그 즉시 너희 모두는 지옥 불덩이로 떨어질 것이다."</p>
+          <p id="story-text-5">처음 보는 무시무시한 저울에 당황한 천사와 악마는 그동안 싸웠던 사실도 잊고 머리를 맞대기 시작했습니다.</p>
+        </div>
+        
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid #ef4444;">
+          <div style="font-size: 14px; color: #fca5a5; margin-bottom: 8px; font-weight: bold;">[필수] 심판장에 입장하기 전, 학번과 이름을 적어주세요.</div>
+          <input type="text" id="student-name" class="blank-text" style="margin-top: 0; border-color: #ef4444; color: #fca5a5; font-size: 16px;" placeholder="예: 10101 이정은">
+        </div>
+
+        <button class="btn-gold" style="padding: 16px 32px;" onclick="startExperience()">심판의 저울 실험실 입장하기 →</button>
+      </div>
+      
+      <!-- 공포스러운 붉은 지하세계 이미지 -->
+      <div class="intro-img-box">
+        <img src="https://images.unsplash.com/photo-1505635552518-3448ff116af3?auto=format&fit=crop&w=800&q=80" 
+             alt="염라대왕의 심판 지옥불" 
+             style="width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.9;">
+        <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to top, #0b0f19 5%, transparent 60%); pointer-events: none;"></div>
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div class="card-sm">
+        <div class="math-tok tok-b" style="font-size: 20px; padding: 8px 16px; margin-bottom: 12px;">❤️ +1</div>
+        <div style="font-size: 16px; font-weight: 700; color: #fca5a5;">빨간 하트 (양수)</div>
+        <div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">저울을 내리는 선행</div>
+      </div>
+      <div class="card-sm">
+        <div class="math-tok tok-s" style="font-size: 20px; padding: 8px 16px; margin-bottom: 12px;"><span class="blue-balloon">🎈</span> −1</div>
+        <div style="font-size: 16px; font-weight: 700; color: #93c5fd;">파란 풍선 (음수)</div>
+        <div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">저울을 올리는 악행</div>
+      </div>
+      <div class="card-sm">
+        <div class="math-tok tok-x" style="font-size: 20px; padding: 8px 16px; margin-bottom: 12px;">💎 x</div>
+        <div style="font-size: 16px; font-weight: 700; color: #d8b4fe;">공도 점수 (미지수)</div>
+        <div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">우리가 찾아야 할 값</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 저울 실험실 ══ -->
+  <div id="pg-lab" class="pg">
+    <div class="sec-title">운명의 저울 실험실</div>
+    <div class="sec-sub">저울의 평형을 직접 맞춰보며 규칙을 발견하세요!</div>
+    
+    <div class="card" style="padding: 24px;">
+      <div style="font-size: 16px; color: #ef4444; font-weight: 800; margin-bottom: 16px;">① 저울의 왼쪽과 오른쪽에 자유롭게 놓기</div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 16px;">
+        <button class="btn-gold" style="padding: 10px 16px;" onclick="labAdd('balloon','L')">❤️ +1 (왼쪽)</button>
+        <button class="btn-out" style="padding: 10px 16px; border-color: #3b82f6; color:#93c5fd;" onclick="labAdd('stone','L')"><span class="blue-balloon">🎈</span> −1 (왼쪽)</button>
+        <button class="btn-blue" style="padding: 10px 16px; border-color: #a855f7; color:#d8b4fe; background:rgba(168,85,247,0.1);" onclick="labAdd('x','L')">💎 x (왼쪽)</button>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn-gold" style="padding: 10px 16px;" onclick="labAdd('balloon','R')">❤️ +1 (오른쪽)</button>
+        <button class="btn-out" style="padding: 10px 16px; border-color: #3b82f6; color:#93c5fd;" onclick="labAdd('stone','R')"><span class="blue-balloon">🎈</span> −1 (오른쪽)</button>
+        <button class="btn-blue" style="padding: 10px 16px; border-color: #a855f7; color:#d8b4fe; background:rgba(168,85,247,0.1);" onclick="labAdd('x','R')">💎 x (오른쪽)</button>
+      </div>
+    </div>
+    
+    <div id="lab-scale-view" style="margin-bottom: 32px;"></div>
+    
+    <div class="card" style="padding: 24px;">
+      <div style="font-size: 16px; color: #ef4444; font-weight: 800; margin-bottom: 16px;">② 양쪽 저울에 '동시에' 계산 적용하기</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <select id="lab-op" class="blank-text" style="font-size: 16px; margin-top: 0; background: #161e2e;">
+            <option value="+">+ 더하기</option>
+            <option value="-">− 빼기</option>
+            <option value="*">× 곱하기</option>
+            <option value="/">÷ 나누기</option>
+          </select>
+        </div>
+        <div>
+          <input id="lab-num" type="number" value="1" min="1" max="10" class="blank-text" style="margin-top: 0; text-align: center; background: #161e2e; font-weight: bold;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn-gold" style="flex: 1;" onclick="labApply()">수평 유지 여부 확인</button>
+        <button class="btn-red" onclick="labReset()">저울 초기화</button>
+      </div>
+      <div id="lab-fb" class="feedback"></div>
+    </div>
+    
+    <div class="card" style="padding: 24px; border-color: #3b82f6; background: rgba(30, 58, 138, 0.1);">
+      <div style="font-size: 18px; color: #60a5fa; font-weight: 800; margin-bottom: 12px;">③ 실험 결과 분석하기 (나만의 추측 & 모둠별 추측)</div>
+      <div style="font-size: 15px; color: #cbd5e1; margin-bottom: 16px;">저울이 수평을 유지하려면 어떤 수학적 규칙이 있을까요? 먼저 나의 생각을 적고, 모둠원과 토의한 결과를 적어보세요!</div>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <div style="font-size: 14px; color: #93c5fd; margin-bottom: 6px; font-weight: bold;">[나만의 추측]</div>
+          <textarea id="lab-guess-personal" class="blank-text" rows="2" placeholder="예: 양쪽에 똑같은 걸 더하거나 빼야 수평이 유지된다!"></textarea>
+        </div>
+        <div>
+          <div style="font-size: 14px; color: #fca5a5; margin-bottom: 6px; font-weight: bold;">[모둠별 추측]</div>
+          <textarea id="lab-guess-group" class="blank-text" rows="2" placeholder="친구들과 토의해서 내린 최종 결론을 적어보세요."></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; display: flex; gap: 16px; justify-content: center; margin-top: 32px;">
+      <button class="btn-out" onclick="goPage('intro')">← 이전</button>
+      <button class="btn-gold" onclick="goPage('concept')">가설 확인하기 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 개념 ══ -->
+  <div id="pg-concept" class="pg">
+    <div class="sec-title">등식의 성질</div>
+    <div class="sec-sub">저울의 평형을 유지하는 4가지 절대 법칙</div>
+    
+    <div class="card" style="border-left: 6px solid #ef4444; border-radius: 8px 16px 16px 8px;">
+      <div style="font-size: 18px; color: #f8fafc; line-height: 1.6;">
+        <span style="color: #ef4444; font-weight: 800;">핵심 원리:</span> 등식의 <span style="color: #ef4444; text-decoration: underline;">양변에 동일한 처리</span>를 할 때에만 균형이 깨지지 않는다!
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px;">
+      <div class="card-sm" style="text-align: left; display: flex; align-items: center; gap: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(239, 68, 68, 0.15); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; flex-shrink: 0;">+</div>
+        <div>
+          <div style="font-weight: 800; color: #ef4444; font-size: 18px;">덧셈 성질</div>
+          <div style="color: #cbd5e1; font-family: 'Cambria Math', Georgia, serif; font-size: 17px; margin-top: 4px; letter-spacing: 1px;">a = b 이면, a + c = b + c</div>
+        </div>
+      </div>
+      <div class="card-sm" style="text-align: left; display: flex; align-items: center; gap: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(96, 165, 250, 0.15); color: #60a5fa; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; flex-shrink: 0;">−</div>
+        <div>
+          <div style="font-weight: 800; color: #60a5fa; font-size: 18px;">뺄셈 성질</div>
+          <div style="color: #cbd5e1; font-family: 'Cambria Math', Georgia, serif; font-size: 17px; margin-top: 4px; letter-spacing: 1px;">a = b 이면, a − c = b − c</div>
+        </div>
+      </div>
+      <div class="card-sm" style="text-align: left; display: flex; align-items: center; gap: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(74, 222, 128, 0.15); color: #4ade80; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; flex-shrink: 0;">×</div>
+        <div>
+          <div style="font-weight: 800; color: #4ade80; font-size: 18px;">곱셈 성질</div>
+          <div style="color: #cbd5e1; font-family: 'Cambria Math', Georgia, serif; font-size: 17px; margin-top: 4px; letter-spacing: 1px;">a = b 이면, a × c = b × c</div>
+        </div>
+      </div>
+      <div class="card-sm" style="text-align: left; display: flex; align-items: center; gap: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(248, 113, 113, 0.15); color: #f87171; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; flex-shrink: 0;">÷</div>
+        <div>
+          <div style="font-weight: 800; color: #f87171; font-size: 18px;">나눗셈 성질</div>
+          <div style="color: #cbd5e1; font-family: 'Cambria Math', Georgia, serif; font-size: 17px; margin-top: 4px; letter-spacing: 1px;">a = b 이면, a ÷ c = b ÷ c (단, c ≠ 0)</div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; display: flex; gap: 16px; justify-content: center;">
+      <button class="btn-out" onclick="goPage('lab')">← 이전</button>
+      <button class="btn-gold" onclick="goPage('story')">실전 적용하기 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 스토리/대화 ══ -->
+  <div id="pg-story" class="pg">
+    <div class="sec-title">천사와 악마의 논쟁</div>
+    <div class="sec-sub">등식의 성질을 활용해 공도의 운명을 결정하세요!</div>
+    
+    <div class="card" style="border-color: #ef4444;">
+      <div style="font-size: 15px; color: #94a3b8; margin-bottom: 12px; font-weight: bold;">현재 저울의 상태 ( x − 2 = 3 )</div>
+      
+      <div style="display: flex; justify-content: center; align-items: center; line-height: 2.2;">
+        <div style="flex: 1; text-align: right;">
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-s"><span class="blue-balloon">🎈</span> -1</span>
+          <span class="math-tok tok-s"><span class="blue-balloon">🎈</span> -1</span>
+        </div>
+        <div style="font-size: 24px; padding: 0 16px; flex-shrink: 0;">⚖️</div>
+        <div style="flex: 1; text-align: left;">
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="speech-row">
+      <div class="char-circle devil-c">😈</div>
+      <div class="bubble devil-b">
+        <div class="bubble-name devil-n">악마</div>
+        왼쪽에서 파란 풍선만 쏙 빼서 터트려 버리면 점수를 바로 알 수 있을 거 같은데?
+      </div>
+    </div>
+    <div class="speech-row">
+      <div class="char-circle angel-c">😇</div>
+      <div class="bubble angel-b">
+        <div class="bubble-name angel-n">천사</div>
+        안 돼! 그러면 저울은 기울어져 버려! 평형을 깨뜨리지 않고 어떻게 파란 풍선의 영향력을 없앨 수 있을까?
+      </div>
+    </div>
+    
+    <div class="speech-row">
+      <div class="char-circle devil-c">😈</div>
+      <div class="bubble devil-b">
+        <div class="bubble-name devil-n">악마</div>
+        아! 그럼 파란 풍선 2개를 '무력화'시키기 위해 이렇게 해보는 건 어때?
+        <div style="margin-top: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 16px; border: 1px dashed #ef4444;">
+          <div style="font-size: 14px; color: #fca5a5; margin-bottom: 8px; font-weight: bold;">📝 양변의 균형을 맞추기 위한 아이디어는 무엇일까요?</div>
+          <textarea id="devil-idea" class="blank-text" rows="2" placeholder="평형을 유지하면서 한쪽 변을 정리할 방법을 상상해서 적어보세요."></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="speech-row">
+      <div class="char-circle angel-c">😇</div>
+      <div class="bubble angel-b">
+        <div class="bubble-name angel-n">천사</div>
+        오! 네가 찾은 그 방법 덕분에 균형이 유지되면서 점수만 딱 남았어!<br><br>
+        결국 공도의 점수는 <input id="blank-score" class="blank-input" placeholder="?"> 점이네!!!<br>
+        그럼 공도는 <input id="blank-dest" class="blank-input" style="width: 130px;" placeholder="천국/지옥"> 으로 가겠어!
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+      <button class="btn-out" onclick="checkDevilIdea()">아이디어 분석</button>
+      <button class="btn-gold" onclick="checkBlanks()">심판 결과 확인</button>
+    </div>
+    <div id="devil-result" class="feedback"></div>
+    <div id="blank-result" class="feedback"></div>
+    
+    <div style="text-align: center; margin-top: 32px; display: flex; gap: 16px; justify-content: center;">
+      <button class="btn-out" onclick="goPage('concept')">← 이전</button>
+      <button class="btn-gold" onclick="goPage('mission')">공식 보고서 작성 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 미션 ══ -->
+  <div id="pg-mission" class="pg">
+    <div class="sec-title">염라대왕의 미션</div>
+    <div class="sec-sub">수학적 언어를 사용하여 사건 경위를 보고하세요!</div>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span style="color: #94a3b8; font-weight: bold;">보고서 작성률</span>
+      <span id="m-prog-lbl" style="color: #fbbf24; font-weight: 900;">0 / 2</span>
+    </div>
+    <div class="progress-bar"><div id="m-prog-fill" class="progress-fill" style="width:0%"></div></div>
+    
+    <!-- 미션 1 -->
+    <div class="card">
+      <div style="font-size: 18px; font-weight: 800; color: #fbbf24; margin-bottom: 24px;">📝 문제 1: 평형 원리 기록 ( 2x - 2 = 4 )</div>
+      
+      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 32px; line-height: 2.2;">
+        <div style="flex: 1; text-align: right;">
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-s"><span class="blue-balloon">🎈</span> -1</span>
+          <span class="math-tok tok-s"><span class="blue-balloon">🎈</span> -1</span>
+        </div>
+        <div style="font-size: 24px; padding: 0 16px; flex-shrink: 0;">⚖️</div>
+        <div style="flex: 1; text-align: left;">
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+        </div>
+      </div>
+      
+      <table class="eq-table">
+        <thead>
+          <tr><th style="width: 50%">상황 설명</th><th style="width: 50%">식으로 변환</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>공도 점수 2개, 파란 풍선 2개 = 빨간 하트 4개</td>
+            <td style="font-family: 'Cambria Math', Georgia, serif; color: #fbbf24; text-align: center; font-size: 18px; font-weight: bold;">2x − 2 = 4</td>
+          </tr>
+          <tr>
+            <td>양쪽에 <input id="ma-txt-1" class="eq-input" style="width:100px; font-size:14px; padding:4px;" placeholder="어떤 행동?"></td>
+            <td><input id="ma-1" class="eq-input" placeholder="성질 적용 단계 식"></td>
+          </tr>
+          <tr>
+            <td>왼쪽 공도 점수 2개만 남기기</td>
+            <td><input id="ma-2" class="eq-input" placeholder="정리된 식"></td>
+          </tr>
+          <tr>
+            <td>단 하나의 공도 점수를 찾기 위해 <input id="ma-txt-2" class="eq-input" style="width:100px; font-size:14px; padding:4px;" placeholder="어떤 행동?"></td>
+            <td><input id="ma-3" class="eq-input" placeholder="최종 점수"></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div style="margin-top: 20px; display: flex; gap: 12px;">
+        <button class="btn-gold" onclick="checkMissionA()">보고서 검토</button>
+        <button class="btn-out" onclick="showAnswerA()">모범 예시</button>
+      </div>
+      <div id="ma-result" class="feedback"></div>
+    </div>
+    
+    <!-- 미션 2 -->
+    <div class="card">
+      <div style="font-size: 18px; font-weight: 800; color: #fbbf24; margin-bottom: 24px;">📝 문제 2: 스스로 설계하는 심판대</div>
+      
+      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 32px; line-height: 2.2;">
+        <div style="flex: 1; text-align: right;">
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+        </div>
+        <div style="font-size: 24px; padding: 0 16px; flex-shrink: 0;">⚖️</div>
+        <div style="flex: 1; text-align: left;">
+          <span class="math-tok tok-x">💎 x</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+          <span class="math-tok tok-b">❤️ +1</span>
+        </div>
+      </div>
+      
+      <table class="eq-table">
+        <thead>
+          <tr><th style="width: 50%">수행 계획</th><th style="width: 50%">방정식 해결</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input class="blank-text" value="점수 3개, 빨간 하트 2개 = 점수 1개, 빨간 하트 6개" disabled style="background: transparent; border: none; text-align: center;"></td>
+            <td><input id="mb-1" class="eq-input" placeholder="기초 방정식"></td>
+          </tr>
+          <tr>
+            <td><input class="blank-text" placeholder="어떤 행동을 할까요?" id="mb-desc-1"></td>
+            <td><input id="mb-2" class="eq-input" placeholder="변화된 상태"></td>
+          </tr>
+          <tr>
+            <td><input class="blank-text" placeholder="그 다음 행동은?" id="mb-desc-2"></td>
+            <td><input id="mb-3" class="eq-input" placeholder="변화된 상태"></td>
+          </tr>
+          <tr>
+            <td><input class="blank-text" placeholder="결론 도달을 위해 어떻게 할까요?" id="mb-desc-3"></td>
+            <td><input id="mb-4" class="eq-input" placeholder="최종 해"></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div style="margin-top: 20px; display: flex; gap: 12px;">
+        <button class="btn-gold" onclick="checkMissionB()">보고서 검토</button>
+        <button class="btn-out" onclick="showAnswerB()">모범 예시</button>
+      </div>
+      <div id="mb-result" class="feedback"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 32px; display: flex; gap: 16px; justify-content: center;">
+      <button class="btn-out" onclick="goPage('story')">← 이전</button>
+      <button class="btn-gold" onclick="goPage('quiz')">최종 심판장으로 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 퀴즈 ══ -->
+  <div id="pg-quiz" class="pg">
+    <div class="sec-title">최종 관문</div>
+    <div class="sec-sub">심판을 무사히 마치기 위한 마지막 수학 검증입니다!</div>
+    <div id="quiz-wrap"></div>
+    <div style="text-align: center; margin-top: 32px;">
+      <button id="submit-btn" class="btn-blue" style="padding: 16px 32px; font-size: 18px; margin-bottom: 24px;" onclick="submitData()">선생님께 최종 보고하기 🚀</button>
+      <br>
+      <button class="btn-out" onclick="goPage('mission')">← 이전</button>
+    </div>
+  </div>
+  
+  <!-- ══ 피드백 확인 ══ -->
+  <div id="pg-feedback" class="pg">
+    <div class="sec-title">심판관의 서신 💌</div>
+    <div class="sec-sub">제출 후 선생님이 남기신 수학적 피드백을 확인하세요.</div>
+    
+    <div class="card" style="text-align: center; padding: 40px 20px;">
+      <div style="margin-bottom: 24px;">
+        <input type="text" id="check-name" class="blank-text" style="max-width: 350px; text-align: center; font-size: 18px;" placeholder="학번과 이름을 입력하세요">
+      </div>
+      <button id="fetch-btn" class="btn-gold" style="padding: 16px 32px; font-size: 18px;" onclick="fetchFeedback()">서신 확인하기 🔍</button>
+      
+      <div id="feedback-display" style="display: none; margin-top: 40px; background: rgba(30, 58, 138, 0.2); border: 1px solid #3b82f6; border-radius: 16px; padding: 32px; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <div style="font-size: 16px; color: #93c5fd; margin-bottom: 12px; font-weight: bold;">From. 수학 심판관 이정은 선생님 👩‍🏫</div>
+        <div id="feedback-text" style="font-size: 20px; color: #f8fafc; line-height: 1.8; font-weight: 500;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 자바스크립트 로직 -->
+<script>
+// 선생님께서 보내주신 최종 확인된 웹앱 주소!
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2zAZFYqF0nr-rBuJ9tEpb8O3VfHd9C9a7UFKEFhrniAQxQFrnt3aKFlKyd2AcM-gxDQ/exec";
+
+// --- 음성 합성(TTS) 엔진: 염라대왕 목소리 ---
+function playYamaVoice() {
+  window.speechSynthesis.cancel();
+  
+  // 컴퓨터가 읽을 연기용 대본 (화면에는 안 보입니다!)
+  const dramaticText = "어허!! 천국으로 갈지, 지옥으로 갈지는... 내가 결정하는 것인데! 가아암히!! 내 허락도 없이 데려가려 하느냐아앗!!! ... 절대로! 한순간도! 저 저울이 한쪽으로 기울어서는 안 된다!! 그 즉시, 너희 모두는 지옥 불덩이로 떨어질 것이야아앗!!!!";
+  
+  const utterance = new SpeechSynthesisUtterance(dramaticText);
+  utterance.lang = 'ko-KR';
+  utterance.pitch = 0.1; // 할아버지처럼 아주 굵고 무거운 목소리
+  utterance.rate = 0.75; // 위엄 있게 천천히
+  
+  window.speechSynthesis.speak(utterance);
+}
+
+// --- 오디오 엔진: 두둥 & BGM, 띵동 알림음 ---
+let audioCtx;
+let bgmOsc, bgmGain, lfo, lfoGain;
+let isBgmPlaying = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+  }
+}
+
+function playDoodoong() {
+  try {
+    initAudio();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const now = audioCtx.currentTime;
+    
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(45, now);
+    osc1.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.5, now + 0.02);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    osc1.connect(gain1).connect(audioCtx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.2);
+
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(55, now + 0.15);
+    osc2.frequency.exponentialRampToValueAtTime(20, now + 2.5);
+    gain2.gain.setValueAtTime(0, now + 0.15);
+    gain2.gain.linearRampToValueAtTime(0.7, now + 0.17);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 2.5);
+    
+    const subOsc = audioCtx.createOscillator();
+    const subGain = audioCtx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(40, now + 0.15);
+    subOsc.frequency.exponentialRampToValueAtTime(20, now + 2.5);
+    subGain.gain.setValueAtTime(0, now + 0.15);
+    subGain.gain.linearRampToValueAtTime(0.8, now + 0.17);
+    subGain.gain.exponentialRampToValueAtTime(0.01, now + 2.5);
+
+    osc2.connect(gain2).connect(audioCtx.destination);
+    subOsc.connect(subGain).connect(audioCtx.destination);
+
+    osc2.start(now + 0.15);
+    osc2.stop(now + 2.6);
+    subOsc.start(now + 0.15);
+    subOsc.stop(now + 2.6);
+    
+  } catch(e) {}
+}
+
+function playBGM() {
+  try {
+    initAudio();
+    if (isBgmPlaying) return;
+    
+    bgmOsc = audioCtx.createOscillator();
+    bgmGain = audioCtx.createGain();
+    bgmOsc.connect(bgmGain);
+    bgmGain.connect(audioCtx.destination);
+    
+    bgmOsc.type = 'sine';
+    bgmOsc.frequency.value = 50; 
+    
+    lfo = audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.3; 
+    lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 3;
+    lfo.connect(lfoGain);
+    lfoGain.connect(bgmOsc.frequency);
+    lfo.start();
+    
+    bgmGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    bgmGain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 3); 
+    
+    bgmOsc.start();
+    isBgmPlaying = true;
+  } catch(e) {}
+}
+
+function playDingDong() {
+  try {
+    initAudio();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(659.25, now); 
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.5, now + 0.05);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    osc1.connect(gain1).connect(audioCtx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.5);
+
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(523.25, now + 0.4); 
+    gain2.gain.setValueAtTime(0, now + 0.4);
+    gain2.gain.linearRampToValueAtTime(0.5, now + 0.45);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+    osc2.connect(gain2).connect(audioCtx.destination);
+    osc2.start(now + 0.4);
+    osc2.stop(now + 1.6);
+  } catch(e) {}
+}
+
+function startExperience() {
+  window.speechSynthesis.cancel();
+  playDoodoong();
+  setTimeout(playBGM, 2500);
+  goPage('lab');
+}
+
+const PAGES = ['intro','lab','concept','story','mission','quiz','feedback'];
+
+function getTokHtml(type) {
+  if(type === 'balloon') return `<span class="math-tok tok-b">❤️ +1</span>`;
+  if(type === 'stone') return `<span class="math-tok tok-s"><span class="blue-balloon">🎈</span> -1</span>`;
+  if(type === 'x') return `<span class="math-tok tok-x">💎 x</span>`;
+  return '';
+}
+
+let labL=[], labR=[];
+
+function goPage(id) {
+  PAGES.forEach(p => document.getElementById('pg-'+p).classList.toggle('on', p===id));
+  document.querySelectorAll('.nb').forEach((b,i) => b.classList.toggle('on', PAGES[i]===id));
+  if(id === 'lab') renderLab();
+  if(id === 'quiz') renderQuiz();
+  if(id === 'feedback') {
+    const introName = document.getElementById('student-name').value;
+    if(introName && !document.getElementById('check-name').value) {
+      document.getElementById('check-name').value = introName;
+    }
+  }
+  window.scrollTo(0,0);
+}
+
+function labAdd(t, side) {
+  if(side==='L') labL.push(t); else labR.push(t);
+  renderLab();
+}
+function labReset() { labL=[]; labR=[]; setFb('lab-fb','',''); renderLab(); }
+function removeLabTok(side, idx) {
+  if(side==='L') labL.splice(idx,1); else labR.splice(idx,1);
+  renderLab();
+}
+
+function calcVal(arr) {
+  return arr.reduce((sum, t) => sum + (t==='balloon'?1 : t==='stone'?-1 : 5), 0);
+}
+
+function renderLab() {
+  const wrap = document.getElementById('lab-scale-view');
+  const lv = calcVal(labL), rv = calcVal(labR);
+  const diff = lv - rv;
+  
+  const tilt = Math.max(-20, Math.min(20, -diff * 5));
+  
+  let eL='', eR='';
+  const lxc=labL.filter(t=>t==='x').length, rxc=labR.filter(t=>t==='x').length;
+  const lbc=labL.filter(t=>t==='balloon').length, rbc=labR.filter(t=>t==='balloon').length;
+  const lsc=labL.filter(t=>t==='stone').length, rsc=labR.filter(t=>t==='stone').length;
+  
+  if(lxc) eL += (lxc>1?lxc:'')+'x';
+  if(lbc) eL += (eL?' + ':'') + lbc;
+  if(lsc) eL += (eL?' − ':'−') + lsc;
+  if(!eL) eL = '0';
+  
+  if(rxc) eR += (rxc>1?rxc:'')+'x';
+  if(rbc) eR += (eR?' + ':'') + rbc;
+  if(rsc) eR += (eR?' − ':'−') + rsc;
+  if(!eR) eR = '0';
+
+  const stC = diff===0 ? 'st-balanced' : 'st-tilt';
+  const stT = diff===0 ? '⚖️ 균형 유지 (등식 성립)' : diff>0 ? '↙ 왼쪽이 무거움' : '↘ 오른쪽이 무거움';
+
+  wrap.innerHTML = `
+    <div style="text-align:center; margin-bottom:20px;">
+      <div style="font-family:'Cambria Math',Georgia,serif; font-size:28px; color:#ef4444; margin-bottom:8px; font-weight:bold;">${eL} = ${eR}</div>
+      <div class="scale-status ${stC}">${stT}</div>
+    </div>
+    
+    <div style="position:relative; width: 100%; max-width: 400px; height: 180px; margin: 0 auto;">
+      <div style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:12px; height:120px; background:#475569; border-radius:4px;"></div>
+      <div style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:80px; height:16px; background:#334155; border-radius:8px;"></div>
+      <div style="position:absolute; top:40px; left:50%; width:320px; height:8px; background:#ef4444; transform:translateX(-50%) rotate(${tilt}deg); transform-origin:center; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius:4px; z-index:2;">
+        <div style="position:absolute; left:10px; top:8px; width:2px; height:70px; background:#94a3b8; transform:rotate(${-tilt}deg); transform-origin:top;">
+          <div style="position:absolute; bottom:0; left:-60px; width:122px; height:8px; background:#d97706; border-radius:4px;">
+            <div style="position:absolute; bottom:12px; left:0; width:100%; text-align:center; display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
+               ${labL.map(t=>getTokHtml(t)).join('')}
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute; right:10px; top:8px; width:2px; height:70px; background:#94a3b8; transform:rotate(${-tilt}deg); transform-origin:top;">
+          <div style="position:absolute; bottom:0; left:-60px; width:122px; height:8px; background:#d97706; border-radius:4px;">
+            <div style="position:absolute; bottom:12px; left:0; width:100%; text-align:center; display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
+               ${labR.map(t=>getTokHtml(t)).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute; top:36px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:#f59e0b; border-radius:50%; z-index:3;"></div>
+    </div>
+    
+    <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:start; margin-top:24px;">
+      <div class="card-sm" style="padding:16px; min-height:100px;">
+        <div style="font-size:13px; color:#94a3b8; margin-bottom:12px;">왼쪽 (클릭시 제거)</div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">
+          ${labL.map((t,i)=>`<span style="cursor:pointer" onclick="removeLabTok('L',${i})">${getTokHtml(t)}</span>`).join('') || '<span style="font-size:14px;color:#475569;margin-top:10px;">비어있음</span>'}
+        </div>
+      </div>
+      <div style="font-size:32px; color:#ef4444; font-weight:bold; padding-top:30px;">=</div>
+      <div class="card-sm" style="padding:16px; min-height:100px;">
+        <div style="font-size:13px; color:#94a3b8; margin-bottom:12px;">오른쪽 (클릭시 제거)</div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">
+          ${labR.map((t,i)=>`<span style="cursor:pointer" onclick="removeLabTok('R',${i})">${getTokHtml(t)}</span>`).join('') || '<span style="font-size:14px;color:#475569;margin-top:10px;">비어있음</span>'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function labApply() {
+  const op = document.getElementById('lab-op').value;
+  const n = parseInt(document.getElementById('lab-num').value) || 1;
+  
+  if(op === '+') { for(let i=0; i<n; i++){ labL.push('balloon'); labR.push('balloon'); } }
+  else if(op === '-') { for(let i=0; i<n; i++){ labL.push('stone'); labR.push('stone'); } }
+  else if(op === '*') {
+    const nl=[], nr=[];
+    for(let i=0; i<n; i++){ nl.push(...labL); nr.push(...labR); }
+    labL=nl; labR=nr;
+  }
+  else if(op === '/') {
+    labL = labL.filter((_,i) => i%n === 0);
+    labR = labR.filter((_,i) => i%n === 0);
+  }
+  
+  const opTxt = {'+':'덧셈', '-':'뺄셈', '*':'곱셈', '/':'나눗셈'}[op];
+  setFb('lab-fb', 'ok', `${opTxt} 성질 적용 완료! 양변에 같은 조작을 했으므로 등식의 균형이 유지됩니다.`);
+  renderLab();
+}
+
+function setFb(id, type, msg) {
+  const el = document.getElementById(id);
+  if(!msg) { el.style.display='none'; return; }
+  el.className = 'feedback ' + (type==='ok' ? 'fb-ok' : type==='ng' ? 'fb-ng' : 'fb-tip');
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+function checkDevilIdea() {
+  const v = document.getElementById('devil-idea').value.trim();
+  if(v.length < 2) {
+    setFb('devil-result', 'ng', '❌ 파란 풍선을 어떻게 처리할지 조금 더 구체적으로 적어보세요!');
+  } else {
+    setFb('devil-result', 'tip', '✏️ 기발한 추론이네요! 과연 그 방법이 균형을 유지할지 살펴볼까요?');
+  }
+}
+
+function checkBlanks() {
+  const sc = document.getElementById('blank-score').value.trim();
+  const ds = document.getElementById('blank-dest').value.trim();
+  if(sc === '5' && (ds.includes('천국') || ds.includes('천'))) {
+    setFb('blank-result', 'ok', '🎉 완벽합니다! x - 2 = 3 의 양변에 +2를 하면 x = 5가 됩니다. 공도는 천국으로 가네요!');
+  } else if (sc === '5') {
+    setFb('blank-result', 'tip', '점수는 맞았어요! 점수가 양수라면 천국과 지옥 중 어디일까요?');
+  } else {
+    setFb('blank-result', 'ng', '❌ 아쉽네요. 파란 풍선 2개의 힘(-2)을 없애려면 반대되는 하트(+2)를 양변에 똑같이 주면 어떻게 될까요?');
+  }
+}
+
+let mDone = {A:false, B:false};
+function updateMProg() {
+  const done = Object.values(mDone).filter(Boolean).length;
+  document.getElementById('m-prog-lbl').textContent = done + ' / 2';
+  document.getElementById('m-prog-fill').style.width = (done/2*100) + '%';
+}
+function norm(s) { return s.replace(/\s/g,''); }
+
+function checkMissionA() {
+  const v1 = norm(document.getElementById('ma-1').value);
+  const v2 = norm(document.getElementById('ma-2').value);
+  const v3 = norm(document.getElementById('ma-3').value);
+  
+  const ok1 = v1.includes('2x-2+2=4+2') || v1.includes('2x=6');
+  const ok2 = v2.includes('2x=6');
+  const ok3 = v3.includes('x=3') || v3 === '3';
+  
+  if((ok1 || v1!=='') && ok2 && ok3) {
+    setFb('ma-result', 'ok', '✅ 훌륭합니다! 덧셈과 나눗셈 성질을 정확히 이용했어요.');
+    mDone.A = true; updateMProg();
+  } else {
+    setFb('ma-result', 'ng', '❌ 식을 다시 확인해보세요. 양변에 2를 더하고, 마지막엔 2로 나누어야 합니다.');
+  }
+}
+function showAnswerA() {
+  document.getElementById('ma-1').value = '2x - 2 + 2 = 4 + 2';
+  document.getElementById('ma-2').value = '2x = 6';
+  document.getElementById('ma-3').value = 'x = 3';
+  setFb('ma-result', 'tip', '모범 답안이 입력되었습니다.');
+}
+
+function checkMissionB() {
+  const v1 = norm(document.getElementById('mb-1').value);
+  const v4 = norm(document.getElementById('mb-4').value); 
+  
+  if((v1.includes('3x+2=x+6')) && (v4.includes('x=2') || v4 === '2')) {
+    setFb('mb-result', 'ok', '✅ 대단해요! 과정을 세분화해서 기초부터 차근차근 이해하기 완벽한 풀이입니다!');
+    mDone.B = true; updateMProg();
+  } else {
+    setFb('mb-result', 'ng', '❌ 첫 식은 3x + 2 = x + 6 입니다. 양변에서 x를 먼저 빼고, 그 다음 2를 빼보세요.');
+  }
+}
+function showAnswerB() {
+  document.getElementById('mb-1').value = '3x + 2 = x + 6';
+  document.getElementById('mb-desc-1').value = '양변에서 x를 뺀다';
+  document.getElementById('mb-2').value = '2x + 2 = 6';
+  document.getElementById('mb-desc-2').value = '양변에서 2를 뺀다';
+  document.getElementById('mb-3').value = '2x = 4';
+  document.getElementById('mb-desc-3').value = '양변을 2로 나눈다';
+  document.getElementById('mb-4').value = 'x = 2';
+  setFb('mb-result', 'tip', '모범 답안이 입력되었습니다.');
+}
+
+const QUIZZES = [
+  { q: '등식의 성질에 대한 설명으로 올바른 것은?', choices: ['한쪽 변에만 숫자를 더해도 등식이 성립한다.', '양변에 같은 수를 더하거나 빼도 등식은 성립한다.', '방정식을 풀 때 등식의 성질은 무시해도 된다.', '양변을 0으로 나누어도 등식이 성립한다.'], ans: 1, exp: '등식의 성질: 양변에 같은 수를 더하거나, 빼거나, 곱하거나, 0이 아닌 수로 나누어도 등식은 성립합니다.' },
+  { q: 'x - 5 = 10 을 풀기 위해 적용해야 할 가장 적절한 성질은?', choices: ['양변에 5를 더한다.', '양변에서 5를 뺀다.', '양변에 10을 더한다.', '양변을 5로 나눈다.'], ans: 0, exp: '덧셈의 성질: 양변에 5를 더하면 x - 5 + 5 = 10 + 5가 되어 x = 15가 됩니다.' },
+  { q: '3x - 4 = 11 의 해를 구하세요.', choices: ['x = 3', 'x = 5', 'x = 7', 'x = 15'], ans: 1, exp: '덧셈과 나눗셈의 성질: 양변에 4를 더하면 3x = 15, 그 다음 양변을 3으로 나누면 x = 5 가 됩니다.' }
+];
+
+let qAns = {};
+function renderQuiz() {
+  const wrap = document.getElementById('quiz-wrap');
+  let html = '';
+  let correct = 0;
+  let doneCount = 0;
+
+  QUIZZES.forEach((q, qi) => {
+    if(qAns[qi] !== undefined) doneCount++;
+    if(qAns[qi] === q.ans) correct++;
+    
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div style="font-size:16px; font-weight:700; color:#fbbf24; margin-bottom:12px;">Q${qi+1}. ${q.q}</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">`;
+      
+    q.choices.forEach((c, ci) => {
+      const isSelected = qAns[qi] === ci;
+      const isCorrect = ci === q.ans;
+      const showAnswer = qAns[qi] !== undefined;
+      
+      let bg = '#0b0f19', border = '#334155', color = '#e2e8f0';
+      if(showAnswer) {
+        if(isSelected && isCorrect) { bg = 'rgba(22,101,52,0.3)'; border = '#4ade80'; color = '#4ade80'; }
+        else if(isSelected && !isCorrect) { bg = 'rgba(153,27,27,0.3)'; border = '#f87171'; color = '#f87171'; }
+        else if(isCorrect) { border = '#fbbf24'; color = '#fbbf24'; } 
+      }
+      
+      html += `<button onclick="doQuiz(${qi}, ${ci})" style="background:${bg}; border:1px solid ${border}; color:${color}; padding:14px; border-radius:8px; text-align:left; cursor:pointer; font-size:15px; font-weight:bold; transition:all 0.2s;" ${showAnswer?'disabled':''}>
+        ${ci+1}) ${c}
+      </button>`;
+    });
+    
+    html += `</div>`;
+    if(qAns[qi] !== undefined) {
+      const ok = qAns[qi] === q.ans;
+      html += `<div class="feedback ${ok?'fb-ok':'fb-ng'}" style="margin-top:12px; display:block;">
+        ${ok?'✅ 정답!':'❌ 오답.'} ${q.exp}
+      </div>`;
+    }
+    html += `</div>`;
+  });
+
+  if(doneCount === QUIZZES.length) {
+    html = `<div class="card" style="text-align:center; background:rgba(239,68,68,0.1); border-color:#ef4444;">
+      <div style="font-size:48px; margin-bottom:16px;">🏆</div>
+      <div style="font-size:24px; font-weight:800; color:#ef4444; margin-bottom:8px;">최종 점수: ${correct} / ${QUIZZES.length}</div>
+      <div style="color:#e2e8f0; font-size:16px;">${correct===QUIZZES.length?'완벽합니다! 모든 성질을 이해하셨네요!':'수고하셨습니다. 틀린 문제는 해설을 다시 읽어보세요.'}</div>
+      <button class="btn-out" style="margin-top:24px;" onclick="qAns={}; renderQuiz();">다시 풀기</button>
+    </div>` + html;
+  }
+
+  wrap.innerHTML = html;
+}
+
+function doQuiz(qi, ci) {
+  if(qAns[qi] !== undefined) return;
+  qAns[qi] = ci;
+  renderQuiz();
+}
+
+function submitData() {
+  const name = document.getElementById('student-name').value.trim();
+  const pGuess = document.getElementById('lab-guess-personal').value.trim();
+  const gGuess = document.getElementById('lab-guess-group').value.trim();
+  const combinedGuess = "[개인] " + (pGuess || "작성 안 함") + " / [모둠] " + (gGuess || "작성 안 함");
+  
+  if (!name) {
+    alert("도입부 화면에서 학번과 이름을 먼저 입력해주세요!");
+    goPage('intro');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.innerText = "전송 중...";
+  btn.disabled = true;
+
+  const data = {
+    name: name,
+    labGuess: combinedGuess,
+    mission1: mDone.A ? "O" : "X",
+    mission2: mDone.B ? "O" : "X",
+    quizScore: Object.values(qAns).filter((ans, i) => ans === QUIZZES[i].ans).length,
+    q1_ans: qAns[0] !== undefined ? (qAns[0] + 1) + "번" : "미응답",
+    q2_ans: qAns[1] !== undefined ? (qAns[1] + 1) + "번" : "미응답",
+    q3_ans: qAns[2] !== undefined ? (qAns[2] + 1) + "번" : "미응답"
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(data)
+  })
+  .then(res => {
+    alert("성공적으로 제출되었습니다! 🎉 심판관의 서신을 확인하러 이동합니다.");
+    btn.innerText = "제출 완료 ✅";
+    goPage('feedback'); // 제출 완료 후 자동으로 피드백 화면으로 이동!
+  })
+  .catch(e => {
+    alert("제출에 실패했습니다. 다시 시도해주세요.");
+    btn.innerText = "선생님께 최종 보고하기 🚀";
+    btn.disabled = false;
+  });
+}
+
+function fetchFeedback() {
+  const name = document.getElementById('check-name').value.trim();
+  if (!name) {
+    alert("학번과 이름을 정확히 입력해주세요!");
+    return;
+  }
+
+  const btn = document.getElementById('fetch-btn');
+  btn.innerText = "서신 찾는 중... 💌";
+  btn.disabled = true;
+
+  fetch(WEB_APP_URL + "?name=" + encodeURIComponent(name))
+    .then(res => res.json())
+    .then(data => {
+      // 띵동 소리와 팝업 알림 (데이터가 있을 때만)
+      if(data.feedback && !data.feedback.includes("아직")) {
+        playDingDong();
+        alert("💌 띵동! 선생님의 편지가 도착했습니다!");
+      }
+      
+      document.getElementById('feedback-display').style.display = 'block';
+      document.getElementById('feedback-text').innerText = data.feedback || data.error;
+      btn.innerText = "서신 확인하기 🔍";
+      btn.disabled = false;
+    })
+    .catch(e => {
+      alert("서신을 불러오는 데 실패했습니다. 인터넷 연결을 확인해주세요.");
+      btn.innerText = "서신 확인하기 🔍";
+      btn.disabled = false;
+    });
+}
+
+// 초기화
+renderLab();
+</script>
+</body>
+</html>
